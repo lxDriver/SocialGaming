@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/Monster_1"
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:drawableLeft="@drawable/dragon"
+  		android:gravity="left|center_vertical"
+  		android:text="Drachen" />
+
+    <Button
+        android:id="@+id/Monster_2"
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:drawableLeft="@drawable/image1"
+  		android:gravity="left|center_vertical"
+  		android:text="Vogel" />
+    
+    <Button
+        android:id="@+id/Monster_3"
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:drawableLeft="@drawable/image2"
+  		android:gravity="left|center_vertical"
+  		android:text="Keine Ahnung" />
+
+    <ListView
+        android:id="@+id/Monster_List"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+    
+</LinearLayout>
