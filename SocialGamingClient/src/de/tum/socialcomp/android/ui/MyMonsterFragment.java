@@ -29,6 +29,7 @@ import de.tum.socialcomp.android.R;
 import de.tum.socialcomp.android.R.id;
 import de.tum.socialcomp.android.R.layout;
 import de.tum.socialcomp.android.webservices.util.HttpGetter;
+import de.tum.socialcomp.android.webservices.util.HttpPoster;
 import android.R.string;
 import android.app.Dialog;
 import android.content.Context;
@@ -48,7 +49,8 @@ import android.widget.Toast;
 
 public class MyMonsterFragment extends Fragment {
 
-	
+	String facebookID = MainActivity.getInstance()
+			.getFacebookID(getActivity());
 	
 	
 	@Override
@@ -62,9 +64,68 @@ public class MyMonsterFragment extends Fragment {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
+						/*
+						 * what happens by clicking on the first monster
+						 * 
+						 * first send a test message to the server
+						 * if he receives the message he sends a poke back to the user						
+						 */
+						
+						Toast.makeText(
+								MyMonsterFragment.this.getActivity(),
+								"Sending Test Message",
+								Toast.LENGTH_LONG).show();
+						
+						new HttpPoster().execute(new String[] { "test", facebookID,
+								"test"});
 						
 					}});
 		
+		rootView.findViewById(R.id.Monster_2).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						/*
+						 * what happens by clicking on the first monster
+						 * 
+						 * first send a test message to the server
+						 * if he receives the message he sends a poke back to the user						
+						 */
+						
+						Toast.makeText(
+								MyMonsterFragment.this.getActivity(),
+								"Sending Monster",
+								Toast.LENGTH_LONG).show();
+						
+						new HttpPoster().execute(new String[] { "Monsters", "2",
+								"add"});
+						
+					}});
+		
+		
+		rootView.findViewById(R.id.Monster_3).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						/*Toast.makeText(
+								MyMonsterFragment.this.getActivity(),
+								"Asking for Monsters",
+								Toast.LENGTH_LONG).show();
+						*/
+						HttpGetter request = new HttpGetter();
+						request.execute(new String[] { "Monsters", "2",
+								"get" });
+						
+						String gameID = request.getResult().toString();
+						
+						Toast.makeText(
+								MyMonsterFragment.this.getActivity(),
+								gameID,
+								Toast.LENGTH_LONG).show();
+						
+						
+					}});
+					
 					
 	return rootView;
 	}
