@@ -410,8 +410,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private void initFacebookSessionAndLoginOnCallback() {
 		Log.i(this.getClass().getName(), "Trying to log in to Facebook...");
 		// start Facebook Login
+		
 		Session.openActiveSession(this, true, new Session.StatusCallback() {
 
+			
 			// callback when session changes state
 			@Override
 			public void call(Session session, SessionState state,
@@ -421,7 +423,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 				
 				new HttpPoster().execute(new String[] { "users"});
-				
+				//session.closeAndClearTokenInformation();
 				if (session.isOpened()) {
 					// send all credentials to the server
 

@@ -93,8 +93,8 @@ public class MyMonsterFragment extends Fragment {
 						/*
 						 * what happens by clicking on the first monster
 						 * 
-						 * first send a test message to the server
-						 * if he receives the message he sends a poke back to the user						
+						 * create a first test monster
+						 * 						
 						 */
 						
 						Toast.makeText(
@@ -102,45 +102,14 @@ public class MyMonsterFragment extends Fragment {
 								"Sending Monster",
 								Toast.LENGTH_LONG).show();
 						
-						new HttpPoster().execute(new String[] { "Monsters", "2", "Monster1","1",
+						new HttpPoster().execute(new String[] { "Monsters", "2", "Feurigum","1", facebookID,
 								"add"});
 						
 					}});
 		
 		
-		rootView.findViewById(R.id.Monster_3).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						/*Toast.makeText(
-								MyMonsterFragment.this.getActivity(),
-								"Asking for Monsters",
-								Toast.LENGTH_LONG).show();
-						*/
-						HttpGetter request = new HttpGetter();
-						request.execute(new String[] { "Monsters", "2",
-								"get" });
-						
-						
-						
-						//String gameID = request.getResult().toString();
-						String Monster= "Fehler beim umwandeln";
-						try {
-							Monster = request.get();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
-						Toast.makeText(
-								MyMonsterFragment.this.getActivity(),
-								Monster,
-								Toast.LENGTH_LONG).show();
-						
-						
-						
-						
-						
-					}});
+		
+		
 		//array list with values to display
 		//TODO replace with monsters from database
 		HttpGetter request = new HttpGetter();
@@ -166,11 +135,15 @@ public class MyMonsterFragment extends Fragment {
 							.getJSONObject(i);
 
 					String Name = jsonMonster
-							.getString("Name");
-					/*String Level = jsonMonster
+							.getString("name");
+					Toast.makeText(
+							MyMonsterFragment.this.getActivity(),
+							"new value"+ Name,
+							Toast.LENGTH_LONG).show();
+					String Level = jsonMonster
 							.getString("level");
-					*/
-					valueList.add(Name/*+Level*/);
+					
+					valueList.add("Level "+Level + " "+Name);
 				}
 			
 				//instantiate the list
@@ -205,7 +178,7 @@ public class MyMonsterFragment extends Fragment {
 			} catch (Exception e) { // various Exceptions can be
 				// thrown in the process, for
 				// brevity we do a 'catch all'
-				Log.e("Map", e.getMessage());
+				Log.e("mymonsterfragment", e.getMessage());
 			}
 
 	
