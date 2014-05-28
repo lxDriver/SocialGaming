@@ -97,7 +97,7 @@ public class MyMonsterFragment extends Fragment {
 								"Sending Monster",
 								Toast.LENGTH_LONG).show();
 						
-						new HttpPoster().execute(new String[] { "Monsters", "2",
+						new HttpPoster().execute(new String[] { "Monsters", "2", "Monster1","1",
 								"add"});
 						
 					}});
@@ -116,6 +116,8 @@ public class MyMonsterFragment extends Fragment {
 						request.execute(new String[] { "Monsters", "2",
 								"get" });
 						
+						
+						
 						String gameID = request.getResult().toString();
 						
 						Toast.makeText(
@@ -126,7 +128,8 @@ public class MyMonsterFragment extends Fragment {
 						
 					}});
 					
-					
+			
+		
 	return rootView;
 	}
 	
