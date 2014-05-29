@@ -76,14 +76,11 @@ public class MyMonsterFragment extends Fragment {
 						 * if he receives the message he sends a poke back to the user						
 						 */
 						
-						Toast.makeText(
-								MyMonsterFragment.this.getActivity(),
-								"Sending Test Message",
-								Toast.LENGTH_LONG).show();
+						//new FightSectionFragment();
 						
-						new HttpPoster().execute(new String[] { "test", facebookID,
+						/*new HttpPoster().execute(new String[] { "test", facebookID,
 								"test"});
-						
+						*/
 					}});
 		
 		rootView.findViewById(R.id.Monster_2).setOnClickListener(
@@ -102,7 +99,7 @@ public class MyMonsterFragment extends Fragment {
 								"Sending Monster",
 								Toast.LENGTH_LONG).show();
 						
-						new HttpPoster().execute(new String[] { "Monsters", "2", "Feurigum","1", facebookID,
+						new HttpPoster().execute(new String[] { "Monsters", null, "Feurigum","1", facebookID,
 								"add"});
 						
 					}});
@@ -111,7 +108,7 @@ public class MyMonsterFragment extends Fragment {
 		
 		
 		//array list with values to display
-		//TODO replace with monsters from database
+		
 		HttpGetter request = new HttpGetter();
 		request.execute(new String[] { "Monsters", facebookID,
 				"getmyMonsters" });
@@ -160,6 +157,7 @@ public class MyMonsterFragment extends Fragment {
 					public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 							long arg3) {
 						//TODO create Monster fragment and open it here with the given arguments
+						
 						
 						Toast.makeText(
 								MyMonsterFragment.this.getActivity(),

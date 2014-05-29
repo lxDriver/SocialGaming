@@ -20,6 +20,7 @@ public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 			"Map",
 			"Game",
 			"MyMonsters",
+			"Fight"
 	};
 	
     public AppSectionsPagerAdapter(FragmentManager fm) {
@@ -36,8 +37,10 @@ public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
             	return new MapSectionFragment();
             case 2:
             	return new GameSectionFragment();
+            case 3:
+            	return new MyMonsterFragment();
             default :
-                Fragment fragment =  new MyMonsterFragment();
+                Fragment fragment =  new FightSectionFragment();
                 
                 return fragment;
         }
