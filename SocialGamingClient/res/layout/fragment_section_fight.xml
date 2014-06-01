@@ -3,12 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="376dp" >
-
-        
+        android:layout_height="376dp"
+        android:layout_weight="1.12" >
 
         <ProgressBar
             android:id="@+id/health_enemy"
@@ -28,8 +27,6 @@
             android:layout_marginTop="26dp"
             android:src="@drawable/image1" />
 
-        
-
         <ProgressBar
             android:id="@+id/health_me"
             style="?android:attr/progressBarStyleHorizontal"
@@ -38,15 +35,6 @@
             android:layout_alignBottom="@+id/image_me"
             android:layout_alignLeft="@+id/health_enemy"
             android:layout_toLeftOf="@+id/image_enemy" />
-
-        <ImageView
-            android:id="@+id/image_me"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="84dp"
-            android:src="@drawable/image2" />
 
         <TextView
             android:id="@+id/text_enemy"
@@ -66,14 +54,21 @@
             android:text="90"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
+        <ImageView
+            android:id="@+id/image_me"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="49dp"
+            android:src="@drawable/image2" />
+
         <TextView
             android:id="@+id/happening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/image_me"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="28dp"
-            android:layout_marginLeft="51dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:text="Player1 used Attack 1"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -81,24 +76,22 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="62dp" >
 
         <Button
             android:id="@+id/fight"
-            android:layout_width="142dp"
+            android:layout_width="149dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.97"
             android:gravity="left|center_vertical"
             android:text="Fight" />
 
         <Button
             android:id="@+id/heal"
-            android:layout_width="156dp"
+            android:layout_width="149dp"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:text="Heal" />
-        
     </LinearLayout>
 
-   
-   
 </LinearLayout>

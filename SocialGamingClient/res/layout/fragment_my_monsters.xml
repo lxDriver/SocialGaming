@@ -4,27 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/Monster_1"
-  		android:layout_width="fill_parent"
-  		android:layout_height="wrap_content"
-  		android:drawableLeft="@drawable/dragon"
-  		android:gravity="left|center_vertical"
-  		android:text="Drachen" />
-
-    <Button
-        android:id="@+id/Monster_2"
-  		android:layout_width="fill_parent"
-  		android:layout_height="wrap_content"
-  		android:drawableLeft="@drawable/image1"
-  		android:gravity="left|center_vertical"
-  		android:text="Create first Monster" />
-
-    <ListView
+   <ListView
         android:id="@+id/Monster_List"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:drawableLeft="@drawable/dragon" >
     </ListView>
+    
+   <TextView
+android:id="@+id/android:empty"
+android:text="Looks like you don't have any Monsters?"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent" />
+   
     
 </LinearLayout>

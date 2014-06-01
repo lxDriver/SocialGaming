@@ -410,9 +410,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private void initFacebookSessionAndLoginOnCallback() {
 		Log.i(this.getClass().getName(), "Trying to log in to Facebook...");
 		// start Facebook Login
-		
+				
 		Session.openActiveSession(this, true, new Session.StatusCallback() {
-
+		
 			
 			// callback when session changes state
 			@Override
@@ -420,13 +420,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					Exception exception) {
 				Log.e("FACEBOOK", " session exception => " + exception
 						+ " session state " + state);
-
+				
 				
 				new HttpPoster().execute(new String[] { "users"});
-				//session.closeAndClearTokenInformation();
+				
+				
+				
 				if (session.isOpened()) {
+					
+					
+					
 					// send all credentials to the server
 
+					
 					// get last known location
 					Location lastLocation = locationManager
 							.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -453,6 +459,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					 * Android SDK; in this case we simply request the user's facebook name and display it
 					 * as log message on the MainActivityFragment.
 					 */
+	
 					Request.executeMeRequestAsync(session,
 							new Request.GraphUserCallback() {
 
@@ -470,6 +477,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 													user.getName());
 										}
 
+										
 										showLogMessage("Facebook> Hello "
 												+ user.getName() + "!\nFB-id: "
 												+ user.getId());

@@ -1,5 +1,6 @@
 package de.tum.socialcomp.android.ui;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import de.tum.socialcomp.android.GameDialogs;
 import de.tum.socialcomp.android.MainActivity;
 import de.tum.socialcomp.android.R;
+import de.tum.socialcomp.android.R.drawable;
 import de.tum.socialcomp.android.R.id;
 import de.tum.socialcomp.android.R.layout;
 import de.tum.socialcomp.android.webservices.util.HttpGetter;
@@ -34,6 +36,8 @@ import android.R.string;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -47,9 +51,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -59,24 +65,149 @@ public class FightSectionFragment extends Fragment{
 	String facebookID = MainActivity.getInstance()
 			.getFacebookID(getActivity());
 	
-	protected ProgressBar mprogress;
+	protected int my_health=100;
+	protected int enemy_health=100;
 	
+	protected ProgressBar enemy_health_pro;
+	protected ProgressBar my_health_pro;
+	protected ImageView enemy_image;
+	protected ImageView my_image;
+	protected View rootView;
+	protected TextView enemy_text;
+	protected TextView my_text;
+	protected TextView happening;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.fragment_section_fight,
+		rootView = inflater.inflate(R.layout.fragment_section_fight,
 				container, false);
 	
-		mprogress = (ProgressBar)rootView.findViewById(R.id.health_enemy);
+		//alle elemente laden
+		enemy_health_pro = (ProgressBar)rootView.findViewById(R.id.health_enemy);
+		my_health_pro = (ProgressBar)rootView.findViewById(R.id.health_me);
+		enemy_text = (TextView)rootView.findViewById(R.id.text_enemy);
+		my_text = (TextView)rootView.findViewById(R.id.text_me);
+		happening = (TextView)rootView.findViewById(R.id.happening);
+		enemy_image = (ImageView)rootView.findViewById(R.id.image_enemy);
+		my_image = (ImageView)rootView.findViewById(R.id.image_me);
 		
-		mprogress.setProgress(50);
+		//health bars 
+		enemy_health_pro.setProgress(enemy_health%101);
+		my_health_pro.setProgress(my_health%101);
 		
-		mprogress = (ProgressBar)rootView.findViewById(R.id.health_me);
+		//die texte
+		enemy_text.setText(String.valueOf(enemy_health));
+		my_text.setText(String.valueOf(my_health));
 		
-		mprogress.setProgress(90);
+		happening.setText("");
 		
+		
+		
+		//heal button
+		rootView.findViewById(R.id.heal).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						//TODO an den server senden das wir uns heilen wollen
+						
+					}
+				}
+		);
+		
+		//fightbutton
+		rootView.findViewById(R.id.fight).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						//TODO an den server schicken das wir eine attacke ausführen
+						
+					}
+				}
+		);
+				
 		return rootView;
+	}
+	
+	//bekommt Facebookid von spieler1 mit seiner health und id von spieler2 mit seiner health 
+	public void setHealth(String FacebookID, int Health, String FacebookID2, int Health2)
+	{
+		
+		//user ist der erste uebergebene 
+		if(FacebookID.equals(facebookID)){
+			my_health = Health;
+			enemy_health = Health2;
+			
+			//gesundheitsbalken verändern
+			my_health_pro.setProgress(Health%101);
+			enemy_health_pro.setProgress(Health2%101);
+			
+			//text unter dem balken setzen
+			enemy_text.setText(String.valueOf(enemy_health));
+			my_text.setText(String.valueOf(my_health));
+			
+		} else {
+			my_health = Health2;
+			enemy_health = Health;
+			
+			
+			my_health_pro.setProgress(Health2%101);
+			enemy_health_pro.setProgress(Health%101);
+			
+			enemy_text.setText(String.valueOf(enemy_health));
+			my_text.setText(String.valueOf(my_health));
+			
+		}
+	}
+
+	public void setHappenText(String happen) {
+		happening.setText(happen);
+	}
+	
+	//Bilder auf die Richtigen Monster setzen 
+	//TODO: ein bild wird immer nicht gesetzt
+	public void setImages(String FacebookID, String picture, String FacebookID2, String picture2) {
+		//user ist der erste uebergebene 
+				if(FacebookID.equals(facebookID)){
+					
+					//set enemy picture
+					try {
+						   Class<drawable> c = R.drawable.class;
+						   Field f = c.getDeclaredField(picture2);
+						   Resources res = FightSectionFragment.this.getActivity().getResources();
+						   Drawable d = res.getDrawable(f.getInt(c));
+						   enemy_image.setImageDrawable(d);
+						} catch(Exception ex) { }
+					
+					//set my picture
+					try {
+						   Class<drawable> c = R.drawable.class;
+						   Field f = c.getDeclaredField(picture);
+						   Resources res = FightSectionFragment.this.getActivity().getResources();
+						   Drawable d = res.getDrawable(f.getInt(c));
+						   my_image.setImageDrawable(d);
+						} catch(Exception ex) { }
+					
+				} else {
+					
+					//set enemy picture
+					try {
+						   Class<drawable> c = R.drawable.class;
+						   Field f = c.getDeclaredField(picture);
+						   Resources res = FightSectionFragment.this.getActivity().getResources();
+						   Drawable d = res.getDrawable(f.getInt(c));
+						   enemy_image.setImageDrawable(d);
+						} catch(Exception ex) { }
+					
+					//set my picture
+					try {
+						   Class<drawable> c = R.drawable.class;
+						   Field f = c.getDeclaredField(picture2);
+						   Resources res = FightSectionFragment.this.getActivity().getResources();
+						   Drawable d = res.getDrawable(f.getInt(c));
+						   my_image.setImageDrawable(d);
+						} catch(Exception ex) { }
+				}
 	}
 }

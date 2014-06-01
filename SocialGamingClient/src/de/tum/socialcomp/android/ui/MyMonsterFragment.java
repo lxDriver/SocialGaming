@@ -65,48 +65,6 @@ public class MyMonsterFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_my_monsters,
 				container, false);
 	
-		rootView.findViewById(R.id.Monster_1).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						/*
-						 * what happens by clicking on the first monster
-						 * 
-						 * first send a test message to the server
-						 * if he receives the message he sends a poke back to the user						
-						 */
-						
-						//new FightSectionFragment();
-						
-						/*new HttpPoster().execute(new String[] { "test", facebookID,
-								"test"});
-						*/
-					}});
-		
-		rootView.findViewById(R.id.Monster_2).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						/*
-						 * what happens by clicking on the first monster
-						 * 
-						 * create a first test monster
-						 * 						
-						 */
-						
-						Toast.makeText(
-								MyMonsterFragment.this.getActivity(),
-								"Sending Monster",
-								Toast.LENGTH_LONG).show();
-						
-						new HttpPoster().execute(new String[] { "Monsters", null, "Feurigum","1", facebookID,
-								"add"});
-						
-					}});
-		
-		
-		
-		
 		//array list with values to display
 		
 		HttpGetter request = new HttpGetter();
@@ -125,7 +83,7 @@ public class MyMonsterFragment extends Fragment {
 						.getJSONArray("Monster");
 				
 				//array with the entrys for the listview
-				List<String> valueList = new ArrayList<String>();
+				List<String> mymonsters = new ArrayList<String>();
 				
 				for (int i = 0; i < jsonMonsters.length(); i++) {
 					JSONObject jsonMonster = jsonMonsters
@@ -133,19 +91,19 @@ public class MyMonsterFragment extends Fragment {
 
 					String Name = jsonMonster
 							.getString("name");
-					Toast.makeText(
-							MyMonsterFragment.this.getActivity(),
-							"new value"+ Name,
-							Toast.LENGTH_LONG).show();
+					
+					//String fid = jsonMonster
+						//	.getString(facebookID);
+					
 					String Level = jsonMonster
 							.getString("level");
 					
-					valueList.add("Level "+Level + " "+Name);
+					mymonsters.add("Level "+Level + " "+Name);
 				}
 			
 				//instantiate the list
 				ListAdapter adapter = new ArrayAdapter<String>(MyMonsterFragment.this.getActivity(),
-						android.R.layout.test_list_item, valueList);
+						android.R.layout.test_list_item, mymonsters);
 				final ListView lv = (ListView)rootView.findViewById(R.id.Monster_List);
 
 				lv.setAdapter(adapter);

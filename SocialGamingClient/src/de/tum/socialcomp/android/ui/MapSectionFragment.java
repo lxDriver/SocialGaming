@@ -9,7 +9,6 @@ import java.util.concurrent.TimeoutException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -30,7 +29,6 @@ import de.tum.socialcomp.android.R;
 import de.tum.socialcomp.android.R.id;
 import de.tum.socialcomp.android.R.layout;
 import de.tum.socialcomp.android.webservices.util.HttpGetter;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -184,7 +182,7 @@ public class MapSectionFragment extends Fragment {
 
 						String facebookID = MainActivity.getInstance()
 								.getFacebookID(getActivity());
-
+						
 						HttpGetter request = new HttpGetter();
 						request.execute(new String[] { "users", facebookID,
 								"getNearbyUsers" });
