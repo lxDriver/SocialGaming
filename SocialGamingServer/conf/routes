@@ -1,0 +1,49 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# User functions: login, get users and update positions
+POST /users/:faceBookAuthToken/:googleCDSToken/:longitude/:latitude/login	controllers.Application.loginUser(faceBookAuthToken: String, googleCDSToken: String, longitude: Double, latitude: Double)
+GET /users/:facebookID/getNearbyUsers 										controllers.Application.getNearbyUsers(facebookID: String)
+
+# Positioning
+POST /positions/:facebookId/:longitude/:latitude/update controllers.Application.updateUserLocation(facebookId: String, longitude: Double, latitude: Double)
+
+# Game requests and event triggering
+POST /games/:facebookID/requestNew 						controllers.Application.requestNewGame(facebookID: String)
+POST /games/:gameID/:facebookID/abort 					controllers.Application.abortGame(gameID: String, facebookID: String)
+POST /games/:gameID/:facebookID/accept 					controllers.Application.acceptGame(gameID: String, facebookID: String)
+POST /games/:gameID/:facebookID/interaction 			controllers.Application.interactionInGame(gameID: String, facebookID: String)
+
+POST /games/:userFacebookID/:recipentFacebookID/poke 	controllers.Application.poke(userFacebookID: String, recipentFacebookID: String)
+
+
+# Post a new Monster
+
+# GET  /Monsters/:Monsterid/get								controllers.Application.getMonster(Monsterid: String)
+
+POST /Monsters/:Monsterid/:Name/:Level/:Facebookid/add		controllers.Application.AddMonster(Monsterid: String, Name: String, Level: String, Facebookid: String)
+GET  /Monsters/:Facebookid/getmyMonsters					controllers.Application.getmyMonsters(Facebookid: String)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
