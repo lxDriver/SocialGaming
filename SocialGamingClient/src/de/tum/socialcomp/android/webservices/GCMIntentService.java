@@ -1,12 +1,14 @@
 package de.tum.socialcomp.android.webservices;
 
+import logic.Game;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import de.tum.socialcomp.android.MainActivity;
-
+import de.tum.socialcomp.android.ui.FightSectionFragment;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -53,6 +55,8 @@ public class GCMIntentService extends IntentService {
 
 	private void handleMessage(Intent intent) {
 		
+		Log.v("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "XXXXXXX");
+		
 		try {
 			JSONObject gcmMessage = new JSONObject(intent.getStringExtra("message"));
 			
@@ -61,13 +65,27 @@ public class GCMIntentService extends IntentService {
 			if(gcmMessage.has("type")){
 				if(gcmMessage.getString("type").equals("game")){
 					
+					
 					MainActivity.getInstance().receivedGameMessage(gcmMessage);
+					
+					
 					
 				} else if(gcmMessage.getString("type").equals("server")){
 					MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("subtype"));
+				} 
+				
+				//game aktuallisierung
+				else if(gcmMessage.getString("type").equals("gamenew")){
+					MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("subtype"));
+				} else {
+					MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("type"));
 				}
+				
 
 			} 
+			else {
+				MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("type"));
+			}
 			
 			
 		} catch (JSONException e) {

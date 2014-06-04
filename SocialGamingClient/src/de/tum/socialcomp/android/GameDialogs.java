@@ -37,8 +37,8 @@ public class GameDialogs {
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(act);
 		Dialog requestDialog = builder
-		        .setMessage("Do you want to play?\n" + gameMessage.getString("user1Name") + " vs. " + gameMessage.getString("user2Name"))
-		        .setNegativeButton("No", new DialogInterface.OnClickListener() {    
+		        .setMessage(gameMessage.getString("user1Name") + " wants to fight you ")
+		        .setNegativeButton("No sry", new DialogInterface.OnClickListener() {    
 
 		            @Override
 		            public void onClick(DialogInterface arg0, int arg1) {
@@ -59,7 +59,7 @@ public class GameDialogs {
 		            }
 		        })
 
-		        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		        .setPositiveButton("Let's burn him", new DialogInterface.OnClickListener() {
 
 
 		            @Override

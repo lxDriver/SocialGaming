@@ -13,5 +13,6 @@
     <string name="refresh_map">Lookup users/refresh map</string>
     
     <string name="request_new_game">Request new game!</string>
+    <string name ="fight">Fight</string>
 </resources>
     

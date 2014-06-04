@@ -67,6 +67,14 @@ public class MyMonsterFragment extends Fragment {
 	
 		//array list with values to display
 		
+		
+		//button
+		
+						HttpPoster post = new HttpPoster();
+						post.execute(new String[] {"Monsters","1","name", "2", facebookID, "add"});
+			
+			
+		
 		HttpGetter request = new HttpGetter();
 		request.execute(new String[] { "Monsters", facebookID,
 				"getmyMonsters" });

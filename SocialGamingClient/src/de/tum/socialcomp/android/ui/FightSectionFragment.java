@@ -73,9 +73,16 @@ public class FightSectionFragment extends Fragment{
 	protected ImageView enemy_image;
 	protected ImageView my_image;
 	protected View rootView;
-	protected TextView enemy_text;
-	protected TextView my_text;
+	protected TextView enemy_text_health;
+	protected TextView my_text_health;
 	protected TextView happening;
+	protected TextView my_name;
+	protected TextView enemy_name;
+	protected TextView my_level;
+	protected TextView enemy_level;
+	
+	
+	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,47 +94,110 @@ public class FightSectionFragment extends Fragment{
 		//alle elemente laden
 		enemy_health_pro = (ProgressBar)rootView.findViewById(R.id.health_enemy);
 		my_health_pro = (ProgressBar)rootView.findViewById(R.id.health_me);
-		enemy_text = (TextView)rootView.findViewById(R.id.text_enemy);
-		my_text = (TextView)rootView.findViewById(R.id.text_me);
+		enemy_text_health = (TextView)rootView.findViewById(R.id.enemy_text_health);
+		my_text_health = (TextView)rootView.findViewById(R.id.my_health_text);
 		happening = (TextView)rootView.findViewById(R.id.happening);
 		enemy_image = (ImageView)rootView.findViewById(R.id.image_enemy);
 		my_image = (ImageView)rootView.findViewById(R.id.image_me);
+		my_name = (TextView)rootView.findViewById(R.id.my_name);
+		enemy_name = (TextView)rootView.findViewById(R.id.enemy_name);
+		my_level = (TextView)rootView.findViewById(R.id.my_level);
+		enemy_level = (TextView)rootView.findViewById(R.id.enemy_level);
+	
 		
 		//health bars 
 		enemy_health_pro.setProgress(enemy_health%101);
 		my_health_pro.setProgress(my_health%101);
 		
 		//die texte
-		enemy_text.setText(String.valueOf(enemy_health));
-		my_text.setText(String.valueOf(my_health));
+		enemy_text_health.setText(String.valueOf(enemy_health));
+		my_text_health.setText(String.valueOf(my_health));
 		
 		happening.setText("");
 		
-		
-		
-		//heal button
-		rootView.findViewById(R.id.heal).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						//TODO an den server senden das wir uns heilen wollen
-						
-					}
-				}
-		);
-		
 		//fightbutton
-		rootView.findViewById(R.id.fight).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						//TODO an den server schicken das wir eine attacke ausführen
+				rootView.findViewById(R.id.fight).setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								//TODO an den server schicken das wir eine attacke ausführen
+								HttpPoster request = new HttpPoster();
+								request.execute(new String[] { "games", facebookID,
+										"requestNew" });
+								try {
+									String requestResult = request.get();
+									if (requestResult.isEmpty()
+											|| !requestResult.equals("{ }")) {
+										
+									}
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
 						
-					}
-				}
-		);
+				);
+		
+		//Item Button
+				rootView.findViewById(R.id.items).setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								//TODO an den server senden das wir uns heilen wollen
+						
+							}
+						}
+				);
+		
+		//Weather attack btn
+				rootView.findViewById(R.id.btn_weather_attack).setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								//TODO an den server schicken das wir eine attacke ausführen
+								
+							}
+						}
+				);
+				
+				//Escape btn
+				rootView.findViewById(R.id.btn_escape).setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								//TODO an den server schicken das wir eine attacke ausführen
+								
+							}
+						}
+				);
+				
+				
+		
+		
 				
 		return rootView;
+	}
+	
+	//gets the level 
+	public void setLevel(String FacebookID, int Level, String FacebookID2, int Level2)
+	{
+		
+		//user ist der erste uebergebene 
+		if(FacebookID.equals(facebookID)){
+			
+			
+			//level neu setzen
+			my_level.setText(Level);
+			enemy_level.setText(Level2);
+			
+		} else {
+			my_level.setText(Level2);
+			enemy_level.setText(Level);
+		}
 	}
 	
 	//bekommt Facebookid von spieler1 mit seiner health und id von spieler2 mit seiner health 
@@ -144,8 +214,8 @@ public class FightSectionFragment extends Fragment{
 			enemy_health_pro.setProgress(Health2%101);
 			
 			//text unter dem balken setzen
-			enemy_text.setText(String.valueOf(enemy_health));
-			my_text.setText(String.valueOf(my_health));
+			enemy_text_health.setText(String.valueOf(enemy_health));
+			my_text_health.setText(String.valueOf(my_health));
 			
 		} else {
 			my_health = Health2;
@@ -155,8 +225,8 @@ public class FightSectionFragment extends Fragment{
 			my_health_pro.setProgress(Health2%101);
 			enemy_health_pro.setProgress(Health%101);
 			
-			enemy_text.setText(String.valueOf(enemy_health));
-			my_text.setText(String.valueOf(my_health));
+			enemy_text_health.setText(String.valueOf(enemy_health));
+			my_text_health.setText(String.valueOf(my_health));
 			
 		}
 	}
