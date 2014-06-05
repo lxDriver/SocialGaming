@@ -1,0 +1,129 @@
+Syntax:
+ID
+name
+level
+defence
+maxhealth
+exp
+picture
+weathercondition 
+	attack 
+	deff 
+	health 
+attack1 
+attack2
+
+START
+001
+waterdragon
+1
+4
+10
+0
+dragon
+rain 
+0
+0
+1
+10
+20
+
+ID 002
+name icebird
+level 0 
+defence 1
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition snow 2,0,0
+attack1 standard 15
+attack2 special 25
+
+ID 003
+name doge
+level 0 
+defence 2
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition sun 2,0,0
+attack1 standard 2
+attack2 special 5
+
+ID 004
+name bat
+level 0 
+defence 1
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition cloudy 0,0,5
+attack1 standard 17
+attack2 special 23
+
+ID 005
+name cloud
+level 0 
+defence 1
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition fog 0,3,0
+attack1 standard 20
+attack2 special 25
+
+ID 006
+name horse
+level 0 
+defence 3
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition wind (two moves in one round)
+attack1 standard (3, 10, count, name)
+attack2 special (4, 3, count, name)
+
+ID 007
+name camel
+level 0 
+defence 3
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition heat (+5 special attack)
+attack1 standard (4, 10, count, name)
+attack2 special (7, 2, count, name)
+
+ID 008
+name wolf
+level 0 
+defence 2
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition fullmoon (summon one wolf per round, summoned wolves do 50% of your damage with every attack)
+attack1 standard (2, 10, count, name)
+attack2 special (4, 5, count, name)
+
+ID 009
+name bear
+level 0 
+defence 4
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition storm (+1 standard attack, +3 special attack)
+attack1 standard (3, 10, count, name)
+attack2 special (6, 1, count, name)
+
+ID 010
+name butterfly
+level 0 
+defence 1
+maxHealth 10
+exp 0
+picture dragon
+weatherCondition day (invulnerable against sun and heat special attacks)
+attack1 standard (2, 10, count, name)
+attack2 special (4, 5, count, name)
+END

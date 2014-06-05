@@ -107,109 +107,77 @@ public class MonsterGame {
     	// out of the box; preferable for such a game would be friend of friends etc
     	// 
     	// this method is costly but primitive
-    	
+    	Logger.info("trying to find oponent");
     	User ret = null;
     	
     	//Get all friends that 1) participate and are 2) nearby and 3) logged in less that 60 mins ago  	
     	LinkedList<User> friends = new LinkedList<User>();
-    	Logger.info("looking up friends");
+    	
     	for(String friendID: user.facebookFriendIDs) {
     		
     		User friend = User.findByFacebookID(friendID);
     		
     		if(friend != null && friend.participatesInGame) {
-    			Logger.info("found one: "+ friend.name);
+    			
     			if(Util.geoLocToDistInMeters(user.loc[0], user.loc[1], friend.loc[0], friend.loc[1]) <= GameConfiguration.MaxDistanceOfUserForNearbyUsers) {
-    				Logger.info(friend.name + " is compatible");
+    			
     				long currentTimeInSeconds = System.currentTimeMillis() / 1000;
     				
     				if(currentTimeInSeconds - friend.lastLogin <= GameConfiguration.MaxTimeForLoginTimeOutInSeconds){
-    					Logger.info("friend is compatible and active" + friend.name +" now adding to list");
+    			
     					friends.add(friend);
     				} 				
     			}    			
     		}
     	}
-    	 	Logger.info("found " + friends.size() + "friends taking one");
+    	 	
     	// choose one of the friends randomly, unless only one friend exists
     	if(friends.size() == 1) {
     		
     		ret = friends.get(0);
-    		Logger.info("Found only 1 user ");
-    		Logger.info("opponent: "+ret.name+ " me "+user.name);
+    		
     	} else if(friends.size() >= 1) {
-    		Logger.info("found multiple users");
+    		
     		ret = friends.get( random.nextInt(friends.size()-1) );
-    		Logger.info("opponent: "+ret.name+ " me "+user.name);
+    		
     	}
-    	
-    	
-    	
-    	Logger.info("creating json");
-    	ObjectNode json = Json.newObject(); 
-		
-		json.put("type", "game");
-		json.put("subtype", "testfound");
-		Logger.info("sending message");
-		user.sendMessage(json);
-		Logger.info("returning");
+    	Logger.info("succes");
     	return ret;
     }
     
-   /* public static Game createAndStartNewGame(User user1, User user2) throws IOException {
-    	//TODO: lookup and test whether a game between both users already exists
-    	 	
-    	Game newGame = new Game(user1, user2);
-    	games().insert(newGame);
-    	
-    	ObjectNode requestMessage = PushMessages.createGameRequestMessage(newGame);
-    	
-    	user1.sendMessage(requestMessage);
-    	user2.sendMessage(requestMessage);
-    	
-    	return newGame;
-    }
-    */
     
 public static MonsterGame createAndStartNewGame(String FacebookID1, String FacebookID2) throws IOException {
     	
-    	
+    	Logger.info("trying to create new game");
     	//user aus der Datenbank laden
-		Logger.info("trying to load the players with fbid "+ FacebookID1 + " " + FacebookID2);
+		Logger.info("looking up users");
     	user1 =  User.findByFacebookID(FacebookID1);
-    	
-    	Logger.info("trying to load player 2");
+    	Logger.info("found user 1");
     	user2 = User.findByFacebookID(FacebookID2);
-    	
-    	Logger.info("user geladen, trying to create game");
+    	Logger.info("found user 2");
+    	Logger.info("creating game with users");
     	//neues Spiel erzeugen
     	MonsterGame newgame = new MonsterGame(user1, user2);
-    	
-    	Logger.info("trying to load Monster from player 1");
+    	Logger.info("game created adding monster");    	
     	//newgame.id = FacebookID1+FacebookID2;
 		newgame.monster_user1 = (Monster) Monster.getfirstmonster(FacebookID1);
-		
-    	
-		Logger.info("trying to load monster from player 2");
+		Logger.info("first monster id added");		
 		newgame.monster_user2 = (Monster) Monster.getfirstmonster(FacebookID2);
+		Logger.info("second monster id added");		
 		
-		
-		Logger.info("game id" + newgame.id);
-		Logger.info(" trage spiel in die datenbank ein");
 		//spiel in der Datenbank einfügen
     	games().insert(newgame);
-    	Logger.info("spiel in die datenbank eingetragen");
-    	//zufall
     	
-    	Logger.info("sende nachrichten an die user");
-    	//node an beginner
+    	Logger.info("game inserted creating push notification");   	
+    	//node an die spieler
     	ObjectNode gameestablished = PushMessages.createGameestablished(newgame, user1.facebookID);
+    	Logger.info("created sending push");
     	user1.sendMessage(gameestablished);
-    	
-    	Logger.info("user 1 erfolreich");
+    	Logger.info("player1 sended succesfull");    	
     	user2.sendMessage(gameestablished);
+    	Logger.info("player2 sended succesfull");    	
     	
-    	Logger.info("user2 erfolgreich");
+    	Logger.info("succes");
     	return newgame;
     }
 
@@ -345,113 +313,45 @@ public static MonsterGame createAndStartNewGame(String FacebookID1, String Faceb
      * @throws IOException
      */
     
-    public void fight(String FacebookID, int myhealth, int enemy_health) throws IOException {
+    public void fight(String FacebookID, String myhealth, String enemy_health) throws IOException {
     	
     	String turn;
     	
+    	//next turn
+    	ObjectNode fightnode;
+    	
     	if(firstUserFbID.equals(FacebookID)) {
-    		this.monster_user1.setHealth(String.valueOf(myhealth));
-    		this.monster_user2.setHealth(String.valueOf(enemy_health));
+    		this.monster_user1.setHealth(myhealth);
+    		this.monster_user2.setHealth(enemy_health);
     		turn = secondUserFbID;
     	} else {
-    		this.monster_user2.setHealth(String.valueOf(myhealth));
-    		this.monster_user1.setHealth(String.valueOf(enemy_health));
+    		this.monster_user2.setHealth(myhealth);
+    		this.monster_user1.setHealth(enemy_health);
     		turn = firstUserFbID;
     	}
     	
     	//hat schon einer verloren?
     	if(Integer.parseInt(monster_user1.getHealth())<0) {
-    		//TODO user1 hat verloren
+    		//TODO datenbankeintrag loeschen
+    		fightnode = PushMessages.createwonmessage(id, user1);
+    		
     		Logger.info("User 1 hat verloren");
     		return;
-    	}
-    
-    	if(Integer.parseInt(monster_user2.getHealth())<0) {
+    	} else if(Integer.parseInt(monster_user2.getHealth())<0) {
     		//TODO user2 hat verloren
+    		fightnode = PushMessages.createwonmessage(id, user2);
     		Logger.info("user 2 hat verloren");
     		return;
+    	} else {
+    	
+    		fightnode = PushMessages.createnextturn(turn, this);
+    		user1.sendMessage(fightnode);
+    		user2.sendMessage(fightnode);
     	}
-    	
-    	//next turn
-    	ObjectNode gameestablished = PushMessages.createnextturn(turn);
-    	user1.sendMessage(gameestablished);
-    	user2.sendMessage(gameestablished);
-    	
     	
     }
     
-    /*
-    public void socialInteraction(String facebookID) throws IOException{
-    	Long time = System.currentTimeMillis();
-    	
-    	/*
-    	if(this.state.equals(StateProgress)){
-    		
-    		Logger.info("offset " + java.lang.Math.abs(this.firstUserInteractionTimeStamp - this.secondUserInteractionTimeStamp)); 
-    		
-    		if(this.firstUserFbID.equals(facebookID) && this.firstUserInteractionTimeStamp < 0L) {
-    			this.firstUserInteractionTimeStamp = time;
-    			this.update();
-    		}
-    		
-    		if(this.secondUserFbID.equals(facebookID) && this.secondUserInteractionTimeStamp < 0L){
-    			this.secondUserInteractionTimeStamp = time;
-    			this.update();
-    		}*/
-    		
-    		// if both timestamps have been set, then the game is finished
-   /* 	//TODO
-    		if(this.firstUserInteractionTimeStamp > 0 && this.secondUserInteractionTimeStamp > 0) {
-    			
-    			User user1 = User.findByFacebookID(this.firstUserFbID);
-            	User user2 = User.findByFacebookID(this.secondUserFbID);
-    			
-    			// see if social interaction took place in a similar time frame (one minute)
-            	// else we have a draw
-            	if(java.lang.Math.abs(this.firstUserInteractionTimeStamp - this.secondUserInteractionTimeStamp) < 60000) {
-            	
-	            	boolean user1Result = flipCoin(0.5); 
-	    			boolean user2Result = flipCoin(0.5);
-	    			
-	    			if(user1Result && !user2Result){
-	    				// user1 won
-	    				user1.addToScoreAndUpdate(5);
-	    				//this.winnerFbID = user1.facebookID;
-	    				//this.winnerName = user1.name;
-	    				
-	    		    	user1.sendMessage(PushMessages.createWonGameMessage(user1, user2));
-	    		    	user2.sendMessage(PushMessages.createLostGameMessage(user2, user1));
-	    				
-	    			} else if(!user1Result && user2Result){
-	    				// user2 won
-	    				user2.addToScoreAndUpdate(5);
-	    				//this.winnerFbID = user2.facebookID;
-	    				//this.winnerName = user2.name;
-	    				
-	    				user2.sendMessage(PushMessages.createWonGameMessage(user2, user1));
-	    		    	user1.sendMessage(PushMessages.createLostGameMessage(user1, user2));
-	    				
-	    			} else {
-	    				// draw
-	    				user1.sendMessage(PushMessages.createDrawGameMessage(user2));
-	    				user2.sendMessage(PushMessages.createDrawGameMessage(user1));
-	    				
-	    				//this.winnerName = "draw";
-	    			} 			
-	    			
-            	} else {
-       				// draw
-    				user1.sendMessage(PushMessages.createDrawGameMessage(user2));
-    				user2.sendMessage(PushMessages.createDrawGameMessage(user1));
-    				
-    				//this.winnerName = "draw";
-            	}
-            	//this.state = StateFinished;
-            	
-    			this.update();
-    		//}
-    	}
-    }*/
+    
     
     /**
      * Administrative methods

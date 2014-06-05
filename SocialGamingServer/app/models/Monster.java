@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import controllers.FacebookAppClient;
 import controllers.PushNotifications;
 import uk.co.panaxiom.playjongo.PlayJongo;
+import models.startmonsters;
 
 public class Monster {
 	
@@ -29,6 +30,8 @@ public class Monster {
 	 
 	 //facebookid des besitzers
 	 protected String FacebookID="";
+	 //welches monster
+	 protected String mid;
 	//Name of the monster.
 	 protected String name = "";
 	//Current level
@@ -37,13 +40,18 @@ public class Monster {
 	 protected String off="";
 	 //defensive
 	 protected String deff="";
+	 
 	//Experience the Monster has
 	 protected String exp="";
 	//Current Health. Reaching 0 means death;
 	 protected String health="";
 	//Max Health without HP Buff
 	 protected String maxHealth="";
-	
+	//link zum bild
+	 protected String picture ="";
+	 
+	 //condition for bonus
+	 protected String bonus ="";
 	 /****************
 	     * Object methods
 	     * -------------
@@ -51,10 +59,11 @@ public class Monster {
 	 
 	 //Create with the only values beeing changed by the user
 	 Monster(String id, String Name, String Level, String FacebookID) {
-		 this.id = id;
+		 this.mid = id;
 		 this.name = Name;
 		 this.level = Level;
 		 this.FacebookID = FacebookID;
+		 
 		 //TODO: rest aus txt oder datenbank laden 
 		 
 		 //for debuging so setzen
@@ -68,6 +77,10 @@ public class Monster {
 	 //simple Constructor for instantiate after db request
 	 Monster(){}
 	 	 
+	 public Monster(String mid) {
+		 //Logger.info("looking up monsters");
+		// startmonsters.get(mid);
+	 }
 	 
 	 /****************
 	     * Class methods
@@ -81,17 +94,19 @@ public class Monster {
 	        return MonsterCollection;
 	    }    
 	 
+	   
 	 
 	 //update the database entry for a Monster
-	 public static void updateMonster(String id, String off, String deff, String level, String health, String exp)
+	 //TODO updaten 
+	 public static void updateMonster(String facebookid, String off, String deff, String level, String health, String exp)
 	 {
-		 monsters().update("{_id: #}", id).with("{$set: {off: #}}", off);
+		 monsters().update("{FacebookID: #}", facebookid).with("{$set: {off: #}}", off);
 	 }
 	 
 	 
-	 //looking up database to find all! Monsters
+	 //looking up database to find my Monsters
 	 //TODO Test
-	 public static Iterable<Monster> findAllMonsters(String FacebookID) {    	
+	 public static Iterable<Monster> findmyMonsters(String FacebookID) {    	
 	    	Logger.info("looking up monsters for user " + FacebookID);
 		 List<Monster> results = Lists.newArrayList(monsters().find("{FacebookID: #}", FacebookID).as(Monster.class));
 		 Logger.info("found "+results.size() + " Monsters for user "+ FacebookID);
@@ -99,6 +114,7 @@ public class Monster {
 	    	return results;
 	    }
 	 
+	 //gibt das erste gefunde Monster aus der Datenbank aus
 	 public static Monster getfirstmonster(String FacebookID) {
 		return monsters().findOne("{FacebookID: #}", FacebookID).as(Monster.class);
 		 
@@ -106,13 +122,14 @@ public class Monster {
 	 
 	 
 	 //looking up a monster by his id in the database
-	public static Monster findbyid(String MonsterID) {
+	 //TODO mit facebookid verbinden
+	public static Monster findbyid(String MonsterID, String Facebookid) {
 		
 		Monster test;
 		Logger.info("Requesting Monster NR " + MonsterID);
 		
 		//find the monster in the collection and save it as a class
-		test = monsters().findOne("{_id: #}", MonsterID).as(Monster.class);
+		test = monsters().findOne("{mid: #, FacebookID: #}", MonsterID, Facebookid).as(Monster.class);
 		
 		Logger.info(test.name);
 				
@@ -123,21 +140,24 @@ public class Monster {
 	//create new database entry for a new Monster
 	public static Monster createMonster(String MonsterID, String Name, String Level, String FacebookID) throws IOException {
     	    	 	
-		String newid = FacebookID+MonsterID;
 		
-		Logger.info("Beginn writing Monster Monster id ");
+		
+		Logger.info("create monster() Beginn writing Monster Monster id ");
 		//is there an entry with the same id?
-		if((monsters().findOne("{_id: #}", FacebookID).as(Monster.class)==null)) {
+		if((monsters().findOne("{FacebookID: #, mid: #}", FacebookID, MonsterID).as(Monster.class)==null)) {
 			
-			Monster newMonster = new Monster(FacebookID, Name, Level, FacebookID);
+			Monster newMonster = startmonsters.get(MonsterID);
+			
+			Logger.info(newMonster.name);
+			newMonster.FacebookID = FacebookID;
 			monsters().save(newMonster);
 			Logger.info("writing Monster "+ FacebookID);
 		
 		}
 		else
 		{	//if entry with same ID exists update with new name and level
-			monsters().update("{_id: #}", FacebookID).with("{$set: {Name: #}}", Name);
-			monsters().update("{_id: #}", FacebookID).with("{$set: {level: #}}", Level);
+			monsters().update("{FacebookID: #, mid: #}", FacebookID, MonsterID).with("{$set: {Name: #}}", Name);
+			monsters().update("{FacebookID: #, mid: #}", FacebookID, MonsterID).with("{$set: {level: #}}", Level);
 			
 			Logger.info("updating Monster "+ FacebookID);
 		}
@@ -156,6 +176,10 @@ public class Monster {
 	        return id;
 
 	    }
+	 
+	 public String getmid() {
+		 return mid;
+	 }
 
 
 	    public String getName() {

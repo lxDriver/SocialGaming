@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Niklas Klügel
  *
  */
-
+/*
 public class Game {
 	// used by Jongo to map JVM objects to database objects
     @JsonProperty("_id")
@@ -73,7 +73,7 @@ public class Game {
      * the game statistics page.
      * @return
      */
-    
+    /*
     public static Iterable<Game> findAllGames() {    	
     	Iterable<Game> iterator = games().find().as(Game.class);
     	
@@ -86,7 +86,7 @@ public class Game {
      * @param user
      * @return
      */
-    
+    /*
     public static User findOpponent(User user){
     	// we are looking up participating friends here, so you can start the application
     	// out of the box; preferable for such a game would be friend of friends etc
@@ -172,7 +172,7 @@ public class Game {
      * @param facebookId
      * @throws IOException
      */
-    
+    /*
     public void accept(String facebookId) throws IOException{
     	Logger.info("accepted game");
     	
@@ -224,7 +224,7 @@ public class Game {
      * @param abortingUserFacebookID
      * @throws IOException
      */
-    
+    /*
     public void abort(String abortingUserFacebookID) throws IOException {
     	this.aborted = true;
     	this.state = StateAborted;
@@ -260,7 +260,7 @@ public class Game {
      * @param facebookID
      * @throws IOException
      */
-    
+    /*
     public void socialInteraction(String facebookID) throws IOException{
     	Long time = System.currentTimeMillis();
     	
@@ -335,7 +335,7 @@ public class Game {
      * Administrative methods
      * 
      */
-
+/*
 	public Game(){}
 	
 	public Game(User user1, User user2){
@@ -350,6 +350,7 @@ public class Game {
 	 * creates a deep copy of this object
 	 * @return
 	 */
+/*
 	private Game copy() {
 		Game cp = new Game();
 		cp.firstUserAccepted = this.firstUserAccepted;
@@ -372,6 +373,7 @@ public class Game {
 	/**
 	 * Updates the whole object in the database using a deep copy with unassigned database/jongo ID.
 	 */
+/*
     private void update() {
     	games().update("{_id: #}",this.id).with(this.copy());
     }
@@ -382,4 +384,4 @@ public class Game {
     }
  
     
-}
+}*/

@@ -36,6 +36,21 @@ public class PushMessages {
 	} 
 	*/
 	
+	public static ObjectNode createwonmessage(String gameid, User winner) {
+		ObjectNode json = Json.newObject(); 
+		
+		MonsterGame game = MonsterGame.findByID(gameid);
+		
+		json.put("type", "game");
+		json.put("subtype", "finished");
+		json.put("gameID", game.id);
+		json.put("winner", winner.facebookID);
+		//TODO uebergabe name und level
+		
+		return json;
+		
+	}
+	
 	public static ObjectNode createGameestablished(MonsterGame game, String turn_fbid) {
 		ObjectNode json = Json.newObject(); 
 		
@@ -45,26 +60,40 @@ public class PushMessages {
 		json.put("user1ID", game.firstUserFbID);
 		json.put("user2ID", game.secondUserFbID);
 		json.put("user1Monster", game.monster_user1.id);
-		json.put("user2Name", game.monster_user2.id);
-		json.put("turn", turn_fbid);
+		json.put("user2Monster", game.monster_user2.id);
+		json.put("monster1name", game.monster_user1.name);
+		json.put("monster2name", game.monster_user2.name);
+		json.put("user1image", game.monster_user1.picture);
+		json.put("turn", game.monster_user2.picture);
+		json.put("user1level", game.monster_user1.level);
+		json.put("user2level", game.monster_user2.level);
+		json.put("player1attack", game.monster_user1.off);
+		json.put("player1deff", game.monster_user1.deff);
+		json.put("player2attack", game.monster_user2.off);
+		json.put("player2deff", game.monster_user2.deff);
 		//TODO uebergabe name und level
 		
 		return json;
 		
 	}
 	
-	
-	public static ObjectNode createAbortGameMessage(Game game, User abortingUser) {
-		ObjectNode json = Json.newObject(); 
+	public static ObjectNode createnextturn(String turn, MonsterGame game) { //turn = facebookid
+		// TODO Auto-generated method stub
+		ObjectNode json = Json.newObject();
 		
 		json.put("type", "game");
-		json.put("subtype", "aborted");
-		json.put("gameID", game.id);
-		json.put("aborterID", abortingUser.facebookID);
-		json.put("aborterName", abortingUser.name);
+		json.put("subtype", "turn");
+		json.put("turn", turn);
+		json.put("player1", game.user1.facebookID);
+		json.put("healthplayer1", game.monster_user1.health);
+		json.put("healthplayer2", game.monster_user2.health);
+		
 		
 		return json;
 	}
+
+	
+	
 	
 	public static ObjectNode createAbortGameMessage(MonsterGame game, User abortingUser) {
 		ObjectNode json = Json.newObject(); 
@@ -79,15 +108,7 @@ public class PushMessages {
 	}
 	
 	
-	public static ObjectNode createEstablishedGameMessage(Game game) {
-		ObjectNode json = Json.newObject(); 
-		
-		json.put("type", "game");
-		json.put("subtype", "established");
-		json.put("gameID", game.id);
-		
-		return json;
-	}
+	
 	
 	public static ObjectNode createEstablishedGameMessage(MonsterGame game) {
 		ObjectNode json = Json.newObject(); 
@@ -145,16 +166,5 @@ public class PushMessages {
 	}
 
 
-	public static ObjectNode createnextturn(String turn) { //turn = facebookid
-		// TODO Auto-generated method stub
-		ObjectNode json = Json.newObject();
-		
-		json.put("type", "game");
-		json.put("subtype", "turn");
-		json.put("turn", turn);
-		
-		
-		return json;
-	}
-
+	
 }

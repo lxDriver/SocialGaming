@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -69,19 +70,19 @@ public class Application extends Controller {
     		json.put("subtype", "login");
     		
     		try {
-				
+				Logger.info("try to send succes message to user");
     			user.sendMessage(json);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
     		
-    		ret = ok("logged in user"+user.name);
+    		ret = ok("logged in user "+user.name);
     	} else {
     		ret = badRequest("Error logging user in!");
     	}
     	
-    	Logger.info("User is:\n "+user.toString());
+    	Logger.info("User is:\n "+user.name + " " +user.loc + " " + user.lastLogin);
     	
     	return ret;
     }
@@ -149,6 +150,8 @@ public class Application extends Controller {
      * @param longitude
      * @param latitude
      * @return
+     * @throws IOException 
+     * @throws MalformedURLException 
      */
     public static Result updateUserLocation(String facebookID, Double longitude, Double latitude) {
     	Result ret;    	    
@@ -157,6 +160,7 @@ public class Application extends Controller {
     	if(user != null) {
     		user.updateLocation(longitude, latitude);
     		Logger.info("Updated user position: "+facebookID+" > "+longitude+" , "+latitude);
+    		
     		
     		ret = ok();
     	} else {
@@ -182,36 +186,35 @@ public class Application extends Controller {
     
     public static Result requestNewGame(String facebookID) throws IOException{
     	Result ret;
-    	Logger.info("requesting"+ facebookID);
+    	Logger.info("requesting game: "+ facebookID);
     	User user = User.findByFacebookID(facebookID);
-    	Logger.info("Found you " +user.name);
-    	Logger.info("User requested new game: "+facebookID);
+    	
 		
-    	Logger.info("looking for oponent");
+    	
 		User opponent = MonsterGame.findOpponent(user);
 		
 		
 		if(opponent != null) {
 			// this will not only add a new Game object to the database but also communicate
 			// the request via Google Cloud Messaging to the opponents
-			Logger.info("found opponent " + opponent.name);
+			
 			try {
-				Logger.info("try to create a new game");
+				
 				MonsterGame.createAndStartNewGame(user.facebookID, opponent.facebookID);
-				Logger.info("game created");
+				Logger.info("succes");
 				ret = ok();
 				
 			} catch (IOException e) {
 				ret = badRequest("Some error occured");
 				e.printStackTrace();
-				Logger.info("error while trying to create the game");
+				
 			}
 			
 			
 			
 		} else {
 			ret = badRequest("No opponent found!");
-			Logger.info("no oponent found");
+			
 		}
     	
     	return ret;
@@ -229,7 +232,7 @@ public class Application extends Controller {
     public static Result abortGame(String gameID, String facebookID){
     	Result ret;
     	
-    	Game game = Game.findByID(gameID);
+    	MonsterGame game = MonsterGame.findByID(gameID);
     	
     	if(game != null){
     		
@@ -297,26 +300,23 @@ public class Application extends Controller {
      * @param gameID
      * @param facebookID
      * @return
+     * @throws IOException 
      */
     
-    public static Result interactionInGame(String gameID, String facebookID){
+    public static Result interactionInGame(String gameID, String facebookID, String my_health, String enemy_health) throws IOException{
     	Result ret;
     	//TODO get health data
-    	int myhealth = 100;
-    	int enemyhealth = 100;
+    	//int myhealth = 100;
+    	//int enemyhealth = 100;
     	MonsterGame game = MonsterGame.findByID(gameID);
+    	
+    	
     	
     	if(game != null){
     		
     		if(!game.isAborted()){
-    			try {
-					game.fight(facebookID, myhealth, enemyhealth-50);
-					ret = ok();
-					
-				} catch (IOException e) {
-					ret = badRequest("Some error occured");
-					e.printStackTrace();
-				}
+    			//neue gesundheitswerte einsetzen
+    	    	game.fight(facebookID, my_health, enemy_health);
     		}
     		
     		ret = ok();
@@ -382,13 +382,13 @@ public class Application extends Controller {
      */
     public static Result AddMonster(String MonsterID, String Name, String Level, String FacebookID) {
     	Result ret;
+    	Logger.info("trying to addmonster");
     	
-    	//User sender = User.findByFacebookID(senderFacebookID);
-    	//Monsters sender = Monsters.createMonster(MonsterID);
     	try {
-			/*Monster newmonster =*/ Monster.createMonster(MonsterID, Name, Level, FacebookID);
+			
+    		Monster.createMonster(MonsterID, Name, Level, FacebookID);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
     	
@@ -404,18 +404,22 @@ public class Application extends Controller {
      * returns one Monster given by the ID
      * may be useless but good for learning ;)
      */
-    public static Result getMonster(String MonsterID) {
+    public static Result getMonster(String MonsterID, String facebookid) {
 
     	Result ret;
     	
+    	
     	Logger.info("Requesting Monsters...");
     	ObjectNode searchResult = Json.newObject();
-    	Monster result = Monster.findbyid(MonsterID);
+    	Monster result = Monster.findbyid(MonsterID, facebookid);
     	
     	
     	//nur etwas zurückgeben wenn wir etwas gefunden haben
     	if(result != null) {
-    	searchResult.put("Monster", models.Monster.findbyid(MonsterID).getName());
+    	searchResult.put("Monster", models.Monster.findbyid(MonsterID,facebookid).getName());
+    	searchResult.put("off", result.getOffensive());
+    	searchResult.put("off", result.getDefence());
+    	
     	ret = ok(searchResult);
     	} else {
     		ret = badRequest("could not find Monster");
@@ -431,37 +435,38 @@ public class Application extends Controller {
     public static Result getmyMonsters(String FacebookID) throws IOException {
     	
     	Result ret;
+    
+    	
     	
     	Logger.info("Requesting Monsters for player: "+ FacebookID);
     	
     	
-    		Iterable<Monster> Monsters = Monster.findAllMonsters(FacebookID);
-    		
-    		if(Monsters != null) {
+    		Iterable<Monster> Monsters = Monster.findmyMonsters(FacebookID);
+    		Logger.info("Monsters found "+ Monsters.toString());
+    		if(Monsters != null&&!Monsters.toString().equals("[]")) {
     			Logger.info("Monsters found");
     			ObjectNode searchResult = Json.newObject();
     			ArrayNode MonsterArray = searchResult.arrayNode();
     			
     	    	for(Monster m: Monsters) {
+    	    		Logger.info("going into for");
     	    			if(m.id !=null&&m.id!=""&&m.id!="{}"&&m.getName() !=null&&m.getName()!=""&&m.getName()!="{}") {
+    	    			Logger.info("getmymonsters went into if because entrys exist");
     	    			ObjectNode MonsterNode = Json.newObject();
     	    			Logger.info("name des monsters "+ m.getName());
     	    			MonsterNode.put("name",m.getName());
     	    			MonsterNode.put("level", m.getLevel());
-    	    			//MonsterNode.put("off", m.getOffensive());
-    	    			MonsterNode.put("deff", m.getDefence());
-    	    			//MonsterNode.put("FacebookID", m.getFacebookID());
+    	    			
     	    			Logger.info("returning monster");
+    	    			
     	    			MonsterArray.add(MonsterNode);
     	    			
     	    			} else {
-    	    				AddMonster("1", "Volcamel", "1", FacebookID);
+    	    				Logger.info("adding monster");
+    	    				AddMonster("001", "", "", FacebookID);
     	    				ret = getmyMonsters(FacebookID);
     	    			}
     	    			
-    	    			
-    	    		
-    	    		
     	    	} 
     	    	
     	    	// just add an array, if we actually have found users, otherwise just send back an empty json
@@ -474,7 +479,7 @@ public class Application extends Controller {
     		
     	} else {
     		Logger.info("trying to create monster with FacebookID" + FacebookID);
-	    		AddMonster("1", "Volcamel", "1", FacebookID);
+	    		AddMonster("001", "", "", FacebookID);
 	    	ret = getmyMonsters(FacebookID);
     		//ret = badRequest("User not recognized");
     	}
@@ -482,6 +487,29 @@ public class Application extends Controller {
     	return ret;
     	
     }
+    
+    public static Result getweather(String facebookid) {
+    	Result ret;
+    	
+    	User who = User.findByFacebookID(facebookid);
+    	
+    	ObjectNode searchResult = Json.newObject();
+    	weather result = weather.getweather(who.loc);
+    	
+    	if(result != null ) {
+    		
+    		searchResult.put("weather", result.ergebnis);
+        	ret = ok(searchResult);
+        	
+    	} else {
+    		ret = badRequest("could not get weather");
+    	}
+    	
+    	return ret;
+    	
+    }
+
+    
 
 
 }

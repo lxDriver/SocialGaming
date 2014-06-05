@@ -1,6 +1,7 @@
 package models;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.google.common.collect.Lists;
 import controllers.FacebookAppClient;
 import controllers.PushNotifications;
 import uk.co.panaxiom.playjongo.PlayJongo;
+import webservices.HttpGet;
 
 
 /**
@@ -108,7 +110,7 @@ public class User {
     private static User insertNewUserWithSimpleProfileData(String name, String fbID) throws IOException {
     	User newUser = new User(name, fbID);
     	newUser.insert();   
-    	Logger.info("insert user"+ newUser.name);
+    	//Logger.info("insert user"+ newUser.name);
     	
     	return newUser;
     }  
@@ -200,9 +202,19 @@ public class User {
      * 
      * @param longitude
      * @param latitude
+     * @throws IOException 
+     * @throws MalformedURLException 
      */
-
+/*
+    public void updateweather(Double longitude, Double latitude) throws MalformedURLException, IOException {
+    	Logger.info("requesting weather");
+    	HttpGet weather = new HttpGet();
+    	String result = weather.getweather(String.valueOf(longitude), String.valueOf(latitude));
+    	Logger.info("weather data: "+ result);
+    }
+  */  
     public void updateLocation(Double longitude, Double latitude){
+    	
     	users().update("{facebookID: #}", this.facebookID).with("{$set: {loc: #}}", (Object) new Double[]{longitude, latitude});
     }
     
@@ -267,6 +279,7 @@ public class User {
     
     public static User updateUserProfileFromLoginCredentials(String facebookAuthToken, String googleCDSToken, Double longitude, Double latitude) throws IOException {
     	User user = null;
+    	
     	
     	
     	com.restfb.types.User facebookUserProfile = FacebookAppClient.getUser(facebookAuthToken);    	

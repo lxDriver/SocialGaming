@@ -19,19 +19,24 @@ POST /positions/:facebookId/:longitude/:latitude/update controllers.Application.
 POST /games/:facebookID/requestNew 						controllers.Application.requestNewGame(facebookID: String)
 POST /games/:gameID/:facebookID/abort 					controllers.Application.abortGame(gameID: String, facebookID: String)
 POST /games/:gameID/:facebookID/accept 					controllers.Application.acceptGame(gameID: String, facebookID: String)
-POST /games/:gameID/:facebookID/interaction 			controllers.Application.interactionInGame(gameID: String, facebookID: String)
+
+POST /games/:gameID/:facebookID/:myhealth/:enemyhealth/interaction 			controllers.Application.interactionInGame(gameID: String, facebookID: String, myhealth: String, enemyhealth: String)
+
+
 
 POST /games/:userFacebookID/:recipentFacebookID/poke 	controllers.Application.poke(userFacebookID: String, recipentFacebookID: String)
 
 
 # Post a new Monster
 
-# GET  /Monsters/:Monsterid/get								controllers.Application.getMonster(Monsterid: String)
+GET  /Monsters/:Monsterid/:facebookid/get								controllers.Application.getMonster(Monsterid: String, facebookid: String)
 
 POST /Monsters/:Monsterid/:Name/:Level/:Facebookid/add		controllers.Application.AddMonster(Monsterid: String, Name: String, Level: String, Facebookid: String)
 GET  /Monsters/:Facebookid/getmyMonsters					controllers.Application.getmyMonsters(Facebookid: String)
 
+#weather
 
+GET /weather/:Facebookid/get								controllers.Application.getweather(Facebookid: String)
 
 
 
