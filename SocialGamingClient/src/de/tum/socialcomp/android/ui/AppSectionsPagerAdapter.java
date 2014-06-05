@@ -18,10 +18,12 @@ public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 	private final String[] sections = new String[]{
 			"Main",
 			"Map",
-			"Game",
 			"MyMonsters",
-			"Fight"
+			""
+			/*"Fight"*/
 	};
+	
+	
 	
     public AppSectionsPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -36,8 +38,6 @@ public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
             case 1: 
             	return new MapSectionFragment();
             case 2:
-            	return new GameSectionFragment();
-            case 3:
             	return new MyMonsterFragment();
             default :
                 Fragment fragment =  new FightSectionFragment();

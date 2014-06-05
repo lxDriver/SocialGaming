@@ -65,7 +65,7 @@ public class GCMIntentService extends IntentService {
 			if(gcmMessage.has("type")){
 				if(gcmMessage.getString("type").equals("game")){
 					
-					
+					//MainActivity.getInstance().getFragmentManager().
 					MainActivity.getInstance().receivedGameMessage(gcmMessage);
 					
 					
@@ -77,6 +77,10 @@ public class GCMIntentService extends IntentService {
 				//game aktuallisierung
 				else if(gcmMessage.getString("type").equals("gamenew")){
 					MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("subtype"));
+				
+				} else if(gcmMessage.getString("type").equals("turn")) {
+					MainActivity.getInstance().receivedGameMessage(gcmMessage);
+					
 				} else {
 					MainActivity.getInstance().showLogMessage("Server (GCM): "+gcmMessage.getString("type"));
 				}

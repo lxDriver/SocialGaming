@@ -42,7 +42,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
@@ -52,10 +51,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+
+
+
+
 // facebook imports
 import com.facebook.*;
 import com.facebook.model.*;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -65,6 +67,7 @@ import de.tum.socialcomp.android.sensor.OnLocationChangeInterface;
 import de.tum.socialcomp.android.sensor.OnShakeListener;
 import de.tum.socialcomp.android.sensor.ShakeListener;
 import de.tum.socialcomp.android.ui.AppSectionsPagerAdapter;
+import de.tum.socialcomp.android.ui.FightSectionFragment;
 import de.tum.socialcomp.android.webservices.util.HttpPoster;
 
 /**
@@ -197,12 +200,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * 
 	 */
 	
+	ActionBar actionBar;
 	private void initPagination() {
 		appSectionsPagerAdapter = new AppSectionsPagerAdapter(
 				getSupportFragmentManager());
 
 		// Set up the action bar.
-		final ActionBar actionBar = getActionBar();
+		actionBar = getActionBar();
 
 		// Specify that the Home/Up button should not be enabled, since there is
 		// no hierarchical
@@ -211,12 +215,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		// Specify that we will be displaying tabs in the action bar.
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+		
 		// Set up the ViewPager, attaching the adapter and setting up a listener
 		// for when the
 		// user swipes between sections.
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		viewPager.setAdapter(appSectionsPagerAdapter);
+		
 		viewPager
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
@@ -518,7 +523,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				processGameMessageOnUIThread(gameMessage);
+				try {
+					processGameMessageOnUIThread(gameMessage);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			}
 		});
@@ -530,7 +540,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * 
 	 * @param gameMessage
 	 */
-	public void processGameMessageOnUIThread(final JSONObject gameMessage) {
+	
+	public String gameid = "";
+	public FightSectionFragment fight;
+	public void processGameMessageOnUIThread(final JSONObject gameMessage) throws InterruptedException {
 		try {
 			String subtype = gameMessage.getString("subtype");
 
@@ -550,35 +563,50 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 			} else if (subtype.equals("established")) {
 				final String gameID = gameMessage.getString("gameID");
-
-				// if all users accepted, start the game
-				final Dialog gameEstablishedDialog = GameDialogs
-						.createGameStartDialog(gameMessage, this);
-				OnShakeListener onShakeListener = new OnShakeListener() {
-
-					@Override
-					public void onShake() {
-
-						// close the dialog and send a message to the server
-						gameEstablishedDialog.dismiss();
-
-						new HttpPoster().execute(new String[] {
-								"games",
-								gameID,
-								MainActivity.this
-										.getFacebookID(MainActivity.this
-												.getBaseContext()),
-								"interaction" });
-
-						// the listener will be automatically removed
-
-					}
-				};
-
-				this.shakeListener.addOnShakeListenerOneShot(onShakeListener);
-
-				showDialog(gameEstablishedDialog);
-
+				Log.v("gameid", gameID);
+				//get the gameid
+				
+				gameid = gameMessage.getString("gameID");
+				
+				//set the screen to the fight section
+				actionBar.setSelectedNavigationItem(3);
+				
+				//get an instance of the fight
+				FightSectionFragment fight = FightSectionFragment.getfightscreen();
+				
+				int myattack, mydeff, enemyattack, enemydeff;
+				//attack und defense werte setzen
+				myattack = Integer.parseInt(gameMessage.getString("player1attack"));
+				mydeff = Integer.parseInt(gameMessage.getString("player1deff"));
+				enemyattack = Integer.parseInt(gameMessage.getString("player2attack"));
+				enemydeff = Integer.parseInt(gameMessage.getString("player2deff"));
+					
+				
+				//werte uebergeben 
+				fight.setattackanddeff(gameMessage.getString("user1ID"), myattack, enemyattack, mydeff, enemydeff);
+				fight.setnamesandlevel(getFacebookID(this), gameMessage.getString("monster1name"), gameMessage.getString("user1level"), gameMessage.getString("user2level"), gameMessage.getString("monster1name"));	
+				fight.setHealth(getFacebookID(this), "100", "100");
+				
+		
+				
+					 
+				} else if(subtype.equals("turn")) {
+					if(gameMessage.getString("turn").equals(getFacebookID(this))) {
+						//TODO update all resources
+						
+						
+						//health werte setzen
+						
+							fight.setHealth(gameMessage.getString("player1"), gameMessage.getString("healthplayer1"), gameMessage.getString("healthplayer2"));
+							//nach aktualisierung spieler wieder freigeben
+							fight.release();
+				} else{
+					//Spieler zur sicherheit noch einmal sperren
+					fight.lock();
+					fight.setHappenText("Oponents turn");
+				}
+				
+				
 			} else if (subtype.equals("won")) {
 				// the user won
 				showDialog(GameDialogs.createUserWonDialog(gameMessage, this));
