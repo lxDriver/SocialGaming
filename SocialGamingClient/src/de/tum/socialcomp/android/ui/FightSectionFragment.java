@@ -33,8 +33,11 @@ import de.tum.socialcomp.android.R.layout;
 import de.tum.socialcomp.android.webservices.util.HttpGetter;
 import de.tum.socialcomp.android.webservices.util.HttpPoster;
 import android.R.string;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -65,12 +68,17 @@ public class FightSectionFragment extends Fragment{
 	String facebookID = MainActivity.getInstance()
 			.getFacebookID(getActivity());
 	
+	
 	protected int my_health=100;
 	protected int enemy_health=100;
+	
+	//TODO aus db laden
 	protected int my_attack = 100;
 	protected int enemy_attack=100;
 	protected int my_deff=20;
 	protected int enemy_deff=30;
+	protected int my_heal=10;
+	protected int enemy_heal=20;
 	
 	protected ProgressBar enemy_health_pro;
 	protected ProgressBar my_health_pro;
@@ -89,7 +97,9 @@ public class FightSectionFragment extends Fragment{
 	
 	private String locked = "locked";
 	private String free = "free";
-	protected String state;
+	private String state = free;
+	
+	
 	
 	private static FightSectionFragment instance = null;
 	
@@ -138,25 +148,32 @@ public class FightSectionFragment extends Fragment{
 						new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								if(state.endsWith(free)) {
+								
+								Log.v("fight ", state + " "+ state.equals("free"));
+								
+								if(state.equals("free")) {
 									//TODO what happens 
-									//POST /games/:gameID/:facebookID/:myhealth/:enemyhealth/interaction
-									//enemy_health = enemy_health -(attack1*enemy_defense);
+									
 									
 									//zufälligen deff mit deff wert zuweisen
+									
 									int block = (int)Math.random() * 100;
+									
+									Log.v("fight", "values" + block + " " +enemy_deff);
 									if(block <= enemy_deff){
+										Log.v("fight", "if");
 										enemy_health = enemy_health - my_attack/2;
 									}
 									else{
+										Log.v("fight", "else");
 										enemy_health = enemy_health - my_attack;
 									}
 									
 									
-									
+									Log.v("fight", "creating server post");
 									HttpPoster end = new HttpPoster();
 									end.execute(new String[]{"games", gameid, facebookID, String.valueOf(my_health), String.valueOf(enemy_health), "interaction"});
-								}
+								} else {}
 							}
 						}
 						
@@ -167,10 +184,25 @@ public class FightSectionFragment extends Fragment{
 						new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								if(state.endsWith(free)) {
+								if(state.equals(free)) {
 									//TODO what happens 
 									//TODO items abrufen game dialog
+									
+									if(my_health <100) {
+									//solange heal funktion
+									my_health = (my_health+my_heal)%101;
+									
+									
+									HttpPoster end = new HttpPoster();
+									end.execute(new String[]{"games", gameid, facebookID, String.valueOf(my_health), String.valueOf(enemy_health), "interaction"});
+									} else {
+										//TODO game dialog health ist voll 
+									}
+									
+								} else {
+									
 								}
+								
 							}
 						}
 				);
@@ -181,12 +213,12 @@ public class FightSectionFragment extends Fragment{
 							@Override
 							public void onClick(View view) {
 								//TODO an den server schicken das wir eine attacke ausführen
-								if(state.endsWith(free)) {
+								if(state.equals(free)) {
 									//TODO what happens 
 									//wetterdaten abrufen
 									
 									HttpPoster end = new HttpPoster();
-									end.execute(new String[]{"games", gameid, facebookID, String.valueOf(my_health), String.valueOf(enemy_health), "interaction"});
+									//end.execute(new String[]{"games", gameid, facebookID, String.valueOf(my_health), String.valueOf(enemy_health), "interaction"});
 								}
 							}
 						}
@@ -217,21 +249,46 @@ public class FightSectionFragment extends Fragment{
 		return rootView;
 	}
 	
-	public void setwithmonsterid(String FacebookID, String monster1, String monster2) {
-		
-			//TODO noch mehr laden? sonst unnötig
-			setImages(FacebookID, monster1, monster2);
-		
+	//TODO test
+	//TODO ausbauen
+	public void setmonsters(String monster1) {
+		HttpGetter request = new HttpGetter();
+		request.execute(new String[] { "Monsters", monster1, facebookID,
+				"get" });
+
+		try {
+			String requestResult = request.get();
+
+			// if we just received an empty json, ignore
+			if (requestResult.isEmpty()
+					|| !requestResult.equals("{ }")) {
+
+				JSONObject json = new JSONObject(requestResult);
+				my_attack = Integer.parseInt(json.getString("off"));
+				my_deff = Integer.parseInt(json.getString("deff"));
+			}
+		} catch (Exception e) { // various Exceptions can be
+			// thrown in the process, for
+			// brevity we do a 'catch all'
+			Log.e("mymonsterfragment", e.getMessage());
+		}
+				
 	}
 	
 	public void setnamesandlevel(String FacebookID, String monster1, String level1, String level2, String monster2) {
 		if(FacebookID.equals(facebookID)) {
+			
 			setLevel(FacebookID, Integer.parseInt(level1), Integer.parseInt(level2));
+			
 			my_name.setText(monster1);
+			
 			enemy_name.setText(monster2);
 		} else {
+			
 			setLevel(FacebookID, Integer.parseInt(level2), Integer.parseInt(level1));
+			
 			my_name.setText(monster2);
+			
 			enemy_name.setText(monster1);
 		}
 	}
@@ -257,22 +314,26 @@ public class FightSectionFragment extends Fragment{
 	
 	//locks/unlocks the screen
 	public void lock() {
-		state = locked;
+		Log.v("fight", "locking");
+		this.state = "locked";
+		Log.v("fight", "locked");
 	}
 	public void release() {
-		state = free;
+		this.state = free;
 	}
 	
 	//gets the level 
 	public void setLevel(String FacebookID, int Level, int Level2) {
-		
+		Log.v("setlevel","START");
 		//user ist der erste uebergebene 
 		if(FacebookID.equals(facebookID)){
 			
 			
 			//level neu setzen
-			my_level.setText(Level);
-			enemy_level.setText(Level2);
+			my_level.setText(String.valueOf(Level));
+			
+			enemy_level.setText(String.valueOf(Level2));
+			
 			
 		} else {
 			my_level.setText(Level2);
@@ -301,8 +362,8 @@ public class FightSectionFragment extends Fragment{
 			enemy_health = Integer.parseInt(Health);
 			
 			
-			my_health_pro.setProgress(enemy_health%101);
-			enemy_health_pro.setProgress(my_health%101);
+			my_health_pro.setProgress(my_health%101);
+			enemy_health_pro.setProgress(enemy_health%101);
 			
 			enemy_text_health.setText(String.valueOf(enemy_health));
 			my_text_health.setText(String.valueOf(my_health));
@@ -315,9 +376,10 @@ public class FightSectionFragment extends Fragment{
 	}
 	
 	//Bilder auf die Richtigen Monster setzen 
-	//TODO: ein bild wird immer nicht gesetzt
+	
 	public void setImages(String FacebookID, String picture,  String picture2) {
 		//user ist der erste uebergebene 
+		
 				if(FacebookID.equals(facebookID)){
 					
 					//set enemy picture

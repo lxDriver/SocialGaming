@@ -65,15 +65,6 @@ public class MyMonsterFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_my_monsters,
 				container, false);
 	
-		//array list with values to display
-		
-		
-		//button
-		
-						HttpPoster post = new HttpPoster();
-						post.execute(new String[] {"Monsters","1","name", "2", facebookID, "add"});
-			
-			
 		
 		HttpGetter request = new HttpGetter();
 		request.execute(new String[] { "Monsters", facebookID,
@@ -109,6 +100,10 @@ public class MyMonsterFragment extends Fragment {
 					mymonsters.add("Level "+Level + " "+Name);
 				}
 			
+				if(mymonsters.size()<=0) {
+					HttpPoster post = new HttpPoster();
+					post.execute(new String[] {"Monsters","001","name", "2", facebookID, "add"});
+				}
 				//instantiate the list
 				ListAdapter adapter = new ArrayAdapter<String>(MyMonsterFragment.this.getActivity(),
 						android.R.layout.test_list_item, mymonsters);

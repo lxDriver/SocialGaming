@@ -541,9 +541,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * @param gameMessage
 	 */
 	
+	
 	public String gameid = "";
-	public FightSectionFragment fight;
 	public void processGameMessageOnUIThread(final JSONObject gameMessage) throws InterruptedException {
+		
 		try {
 			String subtype = gameMessage.getString("subtype");
 
@@ -560,22 +561,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 				// if one user aborted, show who gave up
 				showDialog(GameDialogs.createUserAbortDialog(gameMessage, this));
+				actionBar.setSelectedNavigationItem(0);
 
 			} else if (subtype.equals("established")) {
 				final String gameID = gameMessage.getString("gameID");
 				Log.v("gameid", gameID);
 				//get the gameid
 				
+				String user1 = gameMessage.getString("user1ID");
 				gameid = gameMessage.getString("gameID");
 				
-				//set the screen to the fight section
-				actionBar.setSelectedNavigationItem(3);
+				
+				
 				
 				//get an instance of the fight
 				FightSectionFragment fight = FightSectionFragment.getfightscreen();
 				
 				int myattack, mydeff, enemyattack, enemydeff;
 				//attack und defense werte setzen
+				
 				myattack = Integer.parseInt(gameMessage.getString("player1attack"));
 				mydeff = Integer.parseInt(gameMessage.getString("player1deff"));
 				enemyattack = Integer.parseInt(gameMessage.getString("player2attack"));
@@ -583,47 +587,51 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					
 				
 				//werte uebergeben 
-				fight.setattackanddeff(gameMessage.getString("user1ID"), myattack, enemyattack, mydeff, enemydeff);
-				fight.setnamesandlevel(getFacebookID(this), gameMessage.getString("monster1name"), gameMessage.getString("user1level"), gameMessage.getString("user2level"), gameMessage.getString("monster1name"));	
-				fight.setHealth(getFacebookID(this), "100", "100");
+				fight.setattackanddeff(user1, myattack, enemyattack, mydeff, enemydeff);
 				
-		
+				fight.setImages(user1, gameMessage.getString("user1image"), gameMessage.getString("user2image"));
 				
+				fight.setnamesandlevel(user1, gameMessage.getString("monster1name"), gameMessage.getString("user1level"), gameMessage.getString("user2level"), gameMessage.getString("monster2name"));	
+				
+				fight.setHealth(user1, "100", "100");
+				
+				//set the screen to the fight section
+				actionBar.setSelectedNavigationItem(3);
 					 
 				} else if(subtype.equals("turn")) {
+					
+					//get an instance of the fight
+					FightSectionFragment fight = FightSectionFragment.getfightscreen();
+					
 					if(gameMessage.getString("turn").equals(getFacebookID(this))) {
 						//TODO update all resources
 						
+						fight.setHappenText("Your turn");
 						
 						//health werte setzen
 						
-							fight.setHealth(gameMessage.getString("player1"), gameMessage.getString("healthplayer1"), gameMessage.getString("healthplayer2"));
-							//nach aktualisierung spieler wieder freigeben
-							fight.release();
-				} else{
+						fight.setHealth(gameMessage.getString("player1"), gameMessage.getString("healthplayer1"), gameMessage.getString("healthplayer2"));
+						//nach aktualisierung spieler wieder freigeben
+							
+						fight.release();
+					} else{
 					//Spieler zur sicherheit noch einmal sperren
-					fight.lock();
-					fight.setHappenText("Oponents turn");
+					
+						fight.lock();
+					
+						fight.setHealth(gameMessage.getString("turn"), gameMessage.getString("healthplayer1"), gameMessage.getString("healthplayer2"));
+					
+						fight.setHappenText("Oponents turn");
 				}
 				
 				
-			} else if (subtype.equals("won")) {
+			} else if (subtype.equals("finished")) {
 				// the user won
+				String winner = gameMessage.getString("winner");
 				showDialog(GameDialogs.createUserWonDialog(gameMessage, this));
+				actionBar.setSelectedNavigationItem(0);
 
-			} else if (subtype.equals("lost")) {
-				// the user lost
-				showDialog(GameDialogs.createUserLostDialog(gameMessage, this));
-
-			} else if (subtype.equals("draw")) {
-				// the game was a draw
-				showDialog(GameDialogs.createUserDrawDialog(gameMessage, this));
-
-			} else if (subtype.equals("poke")) {
-				// the user was poked
-				showDialog(GameDialogs.createUserWasPokedDialog(gameMessage,
-						this));
-			}
+			} 
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

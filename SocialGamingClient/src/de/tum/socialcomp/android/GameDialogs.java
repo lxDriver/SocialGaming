@@ -107,6 +107,8 @@ public class GameDialogs {
 		
 		return abortDialog;
 	}
+	
+
 
 	/**
 	 * Dialog shown once the game is established; this is used to indicate that the game

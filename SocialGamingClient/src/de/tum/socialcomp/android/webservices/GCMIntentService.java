@@ -1,7 +1,5 @@
 package de.tum.socialcomp.android.webservices;
 
-import logic.Game;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

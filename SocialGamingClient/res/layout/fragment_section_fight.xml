@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/enemy_text_health"
             android:layout_alignBottom="@+id/enemy_text_health"
-            android:layout_alignRight="@+id/happening"
+            android:layout_toRightOf="@+id/image_me"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
